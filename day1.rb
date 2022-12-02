@@ -52,6 +52,15 @@ def readFile(fileName)
     end
     lines
 end
-partOne =  readFile('input-day1-part1.txt')
+partOne =  readFile('input-day1.txt')
 # puts partOne
 puts maxCalories(parse(partOne))
+
+def topThree(hash) 
+    sorted = hash.values.sort
+    sorted.last(3).sum
+end
+
+
+raise "top 3" unless topThree(parse(testInput)) == 45000
+puts topThree(parse(partOne))
