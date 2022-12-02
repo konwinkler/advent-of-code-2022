@@ -21,6 +21,8 @@ def parse(input)
     input.each { |x|
         if x == ""
             counter += 1
+        elsif x == "\n"
+            counter += 1
         else
             value = Integer(x)
             if hash.has_key?(counter)
@@ -32,7 +34,6 @@ def parse(input)
     }
     hash
 end
-hash = parse(testInput)
 
 def maxCalories(input)
     maxCalories = -1
@@ -41,4 +42,16 @@ def maxCalories(input)
     }
     maxCalories
 end
-raise "example failure" unless maxCalories(hash) == 24000
+
+raise "example failure" unless maxCalories(parse(testInput)) == 24000
+
+def readFile(fileName)
+    lines = []
+    File.readlines(fileName).each do |line|
+        lines.push line
+    end
+    lines
+end
+partOne =  readFile('input-day1-part1.txt')
+# puts partOne
+puts maxCalories(parse(partOne))
