@@ -21,8 +21,6 @@ def parse(input)
     input.each { |x|
         if x == ""
             counter += 1
-        elsif x == "\n"
-            counter += 1
         else
             value = Integer(x)
             if hash.has_key?(counter)
@@ -46,15 +44,11 @@ end
 raise "example failure" unless maxCalories(parse(testInput)) == 24000
 
 def readFile(fileName)
-    lines = []
-    File.readlines(fileName).each do |line|
-        lines.push line
-    end
-    lines
+    File.read(fileName).split("\n")
 end
-partOne =  readFile('input-day1.txt')
-# puts partOne
-puts maxCalories(parse(partOne))
+
+lines = readFile('input-day1.txt')
+puts maxCalories(parse(lines))
 
 def topThree(hash) 
     sorted = hash.values.sort
@@ -63,4 +57,4 @@ end
 
 
 raise "top 3" unless topThree(parse(testInput)) == 45000
-puts topThree(parse(partOne))
+puts topThree(parse(lines))
