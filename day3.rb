@@ -6,7 +6,7 @@ def test_equals(actual, expected)
     raise "test failed, actual: #{actual} expected: #{expected}" unless actual == expected
 end
 
-def value(char)
+def priority(char)
     upperChar = char.ord < 97
     if (upperChar)
         return char.ord - 38
@@ -15,9 +15,8 @@ def value(char)
     end
 end
 
-# test char to point value conversion
-test_equals(value("a"), 1)
-test_equals(value("z"), 26)
-test_equals(value("A"), 27)
-test_equals(value("Z"), 52)
+test_equals(priority("a"), 1)
+test_equals(priority("z"), 26)
+test_equals(priority("A"), 27)
+test_equals(priority("Z"), 52)
 
