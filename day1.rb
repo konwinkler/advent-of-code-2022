@@ -22,7 +22,7 @@ def parse(input)
         if x == ""
             counter += 1
         else
-            value = Integer(x)
+            value = x.to_i
             if hash.has_key?(counter)
                 hash[counter] = hash[counter] + value
             else
