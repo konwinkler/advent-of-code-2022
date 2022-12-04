@@ -48,3 +48,41 @@ end
 test_equals(sum_priorities('input3-example.txt'), 157)
 puts "part 1 #{sum_priorities('input3.txt')}"
 
+def to_groups(all)
+    counter = -1
+    groups = {}
+    all.each_with_index {|rucksack, index|
+        if index % 3 == 0
+            counter += 1
+        end
+        if groups.has_key? counter
+            groups[counter].push rucksack
+        else
+            groups[counter] = [rucksack]
+        end
+    }
+    groups
+end
+
+# find the badge of each group
+def badge_from_group(group)
+    return group[0].split("") & group[1].split("") & group[2].split("")
+end
+
+test_equals(badge_from_group(["a", "a", "a"]), ["a"])
+test_equals(badge_from_group(["abcd", "a", "a"]), ["a"])
+test_equals(badge_from_group(["abcd", "ad", "acd"]), ["a", "d"])
+
+def sum_of_badges(fileName)
+    all_rucksacks = read_file(fileName)
+    groups = to_groups all_rucksacks
+    badges = groups.values.map {|x|
+        badge_from_group x
+    }
+    badges.flatten.map {|x|
+        priority x
+    }.sum
+end
+
+test_equals(sum_of_badges('input3-example.txt'), 70)
+puts "part 2 #{sum_of_badges('input3.txt')}"
