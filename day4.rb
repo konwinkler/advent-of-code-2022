@@ -25,8 +25,7 @@ end
 test_equals(to_range('1-2'), 1..2)
 
 def overlapping_pairs(fileName, full_overlap = true)
-    lines = read_file(fileName)
-    ranges = lines.map {|x|
+    lines = read_file(fileName).map {|x|
         first, second = x.split(",")
         [to_range(first), to_range(second)]
     }.map {|x|
