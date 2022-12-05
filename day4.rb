@@ -13,7 +13,6 @@ def full_overlap?(left, right)
     left_has_all_of_right = right.to_a - left.to_a
     return right_has_all_of_left.empty? || left_has_all_of_right.empty?
 end
-
 test_equals(full_overlap?(1..1, 2..2), false)
 test_equals(full_overlap?(1..2, 2..2), true)
 test_equals(full_overlap?(1..2, 2..3), false)
@@ -30,16 +29,14 @@ def overlapping_pairs(fileName, full_overlap = true)
     ranges = lines.map {|x|
         first, second = x.split(",")
         [to_range(first), to_range(second)]
-    }
-    overlaps = ranges.map {|x|
+    }.map {|x|
         left, right = x
         if full_overlap
             full_overlap?(left, right)
         else
             some_overlap?(left, right)
         end
-    }
-    overlaps.select {|x| x}.length
+    }.select {|x| x}.length
 end
 
 test_equals(overlapping_pairs('input4-example.txt'), 2)
