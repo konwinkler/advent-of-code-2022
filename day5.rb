@@ -17,7 +17,7 @@ test_equals(index_to_pos(1), 0)
 test_equals(index_to_pos(5), 1)
 test_equals(index_to_pos(9), 2)
 
-def top_crates(inputFile)
+def top_crates(inputFile, single = true)
     lines = read_file(inputFile)
     stacks_count = lines[0].length / 3
 
@@ -53,9 +53,18 @@ def top_crates(inputFile)
         # change to zero index 
         from = separated[3].to_i - 1
         to = separated[5].to_i - 1
-        (1..amount).each do
-            item = stacks[from].pop
-            stacks[to].push item
+        if single
+            (1..amount).each do
+                item = stacks[from].pop
+                stacks[to].push item
+            end
+        else
+            items = []
+            (1..amount).each do
+                items.push stacks[from].pop
+            end
+            stacks[to].push items.reverse
+            stacks[to] = stacks[to].flatten
         end
     end
     # puts stacks
@@ -69,6 +78,8 @@ end
 test_equals(top_crates('input5-example.txt'), 'CMZ')
 puts "part 1 #{top_crates('input5.txt')}"
 
+test_equals(top_crates('input5-example.txt', false), 'MCD')
+puts "part 2 #{top_crates('input5.txt', false)}"
 
 
 
