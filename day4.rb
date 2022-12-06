@@ -1,4 +1,5 @@
 require 'set'
+require 'pry'
 
 def read_file(fileName)
     lines = File.read(fileName).split("\n")
@@ -52,3 +53,5 @@ test_equals(some_overlap?(2..2, 2..3), true)
 
 test_equals(overlapping_pairs('input4-example.txt', false), 4)
 puts "part 2 #{overlapping_pairs('input4.txt', false)}"
+binding.pry
+
