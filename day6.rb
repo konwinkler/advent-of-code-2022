@@ -15,12 +15,12 @@ end
 test_equals(all_different(['a', 'b', 'c', 'd']), true)
 test_equals(all_different(['a', 'b', 'c', 'a']), false)
 
-def characters_before_start(input)
+def characters_before_start(input, marker_length = 4)
     buffer = []
     counter = 0
     input.split('').each do |character|
         counter += 1
-        if buffer.length < 4
+        if buffer.length < marker_length
             buffer.push character
         else
             buffer.shift
@@ -39,3 +39,10 @@ test_equals(characters_before_start('nppdvjthqldpwncqszvftbrmjlhg'), 6)
 test_equals(characters_before_start('nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg'), 10)
 test_equals(characters_before_start('zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw'), 11)
 puts "part 1 #{characters_before_start(read_file('input6.txt')[0])}"
+
+test_equals(characters_before_start('mjqjpqmgbljsphdztnvjfqwrcgsmlb', 14), 19)
+test_equals(characters_before_start('bvwbjplbgvbhsrlpgdmjqwftvncz', 14), 23)
+test_equals(characters_before_start('nppdvjthqldpwncqszvftbrmjlhg', 14), 23)
+test_equals(characters_before_start('nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg', 14), 29)
+test_equals(characters_before_start('zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw', 14), 26)
+puts "part 2 #{characters_before_start(read_file('input6.txt')[0], 14)}"
