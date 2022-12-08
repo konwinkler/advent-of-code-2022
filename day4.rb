@@ -1,8 +1,8 @@
 require 'set'
 require 'pry'
 
-def read_file(fileName)
-    lines = File.read(fileName).split("\n")
+def read_file(file_name)
+    lines = File.read(file_name).split("\n")
 end
 
 def test_equals(actual, expected)
@@ -25,8 +25,8 @@ def to_range(input)
 end
 test_equals(to_range('1-2'), 1..2)
 
-def overlapping_pairs(fileName, full_overlap = true)
-    lines = read_file(fileName).map {|x|
+def overlapping_pairs(file_name, full_overlap = true)
+    lines = read_file(file_name).map {|x|
         first, second = x.split(",")
         [to_range(first), to_range(second)]
     }.map {|x|

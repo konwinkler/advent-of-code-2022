@@ -1,8 +1,8 @@
 require 'set'
 require 'pry'
 
-def read_file(fileName)
-    lines = File.read(fileName).split("\n")
+def read_file(file_name)
+    lines = File.read(file_name).split("\n")
 end
 
 def test_equals(actual, expected)

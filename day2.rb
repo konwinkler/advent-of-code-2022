@@ -1,5 +1,5 @@
-def readFile(fileName)
-    File.read(fileName).split("\n")
+def readFile(file_name)
+    File.read(file_name).split("\n")
 end
 
 $pointsForChoice = {

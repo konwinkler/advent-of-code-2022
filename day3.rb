@@ -1,7 +1,7 @@
 require 'set'
 
-def read_file(fileName)
-    lines = File.read(fileName).split("\n")
+def read_file(file_name)
+    lines = File.read(file_name).split("\n")
 end
 
 def test_equals(actual, expected)
@@ -73,8 +73,8 @@ test_equals(badge_from_group(["a", "a", "a"]), ["a"])
 test_equals(badge_from_group(["abcd", "a", "a"]), ["a"])
 test_equals(badge_from_group(["abcd", "ad", "acd"]), ["a", "d"])
 
-def sum_of_badges(fileName)
-    all_rucksacks = read_file(fileName)
+def sum_of_badges(file_name)
+    all_rucksacks = read_file(file_name)
     groups = to_groups all_rucksacks
     badges = groups.values.map {|x|
         badge_from_group x

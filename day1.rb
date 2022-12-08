@@ -43,8 +43,8 @@ end
 
 raise "example failure" unless maxCalories(parse(testInput)) == 24000
 
-def readFile(fileName)
-    File.read(fileName).split("\n")
+def readFile(file_name)
+    File.read(file_name).split("\n")
 end
 
 lines = readFile('input-day1.txt')
