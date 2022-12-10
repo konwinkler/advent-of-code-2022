@@ -1,5 +1,6 @@
 require 'set'
 require 'pry'
+require 'pry-nav'
 
 def read_file(file_name)
     lines = File.read(file_name).split("\n")
@@ -20,16 +21,17 @@ test_equals(should_move?({:x=>0,:y=>-1},{:x=>0,:y=>0}), false)
 test_equals(should_move?({:x=>0,:y=>-2},{:x=>0,:y=>0}), true)
 test_equals(should_move?({:x=>1,:y=>1},{:x=>0,:y=>0}), false)
 
-def tail_positions(file_name)
+def tail_positions(file_name, knots = 2)
     lines = read_file(file_name)
     moves = lines.map {|line| 
         direction, amount = line.split(' ')
         {:direction => direction.to_sym, :steps => amount.to_i}
     }
     # puts moves
-
-    head = {:x => 0, :y =>0}
-    tail = {:x => 0, :y =>0}
+    # binding.pry
+    rope = (1..knots).map do
+        {:x => 0, :y =>0}
+    end
 
     motion = {
         :R => {:axis => :x, :direction => 1},
@@ -40,25 +42,27 @@ def tail_positions(file_name)
 
     visited = Set.new
     moves.each do |move|
-        # puts move
         move_along = motion[move[:direction]]
         (1..move[:steps]).each do |step|
-            head[move_along[:axis]] += move_along[:direction]
-            if !should_move?(head, tail)
-                # no op
-            elsif head[:y] == tail[:y]
-                diff = head[:x] - tail[:x]
-                tail[:x] += diff > 0 ? 1 : -1 
-            elsif head[:x] == tail[:x]
-                diff = head[:y] - tail[:y]
-                tail[:y] += diff > 0 ? 1 : -1
-            else
-                tail[:x] += head[:x] > tail[:x] ? 1 : -1
-                tail[:y] += head[:y] > tail[:y] ? 1 : -1
+            rope.each_with_index do |knot, index|
+                previous = rope[index - 1]
+                if index == 0
+                    # move head
+                    knot[move_along[:axis]] += move_along[:direction]
+                elsif !should_move?(previous, knot)
+                    # no op
+                elsif previous[:y] == knot[:y]
+                    diff = previous[:x] - knot[:x]
+                    knot[:x] += diff > 0 ? 1 : -1 
+                elsif previous[:x] == knot[:x]
+                    diff = previous[:y] - knot[:y]
+                    knot[:y] += diff > 0 ? 1 : -1
+                else
+                    knot[:x] += previous[:x] > knot[:x] ? 1 : -1
+                    knot[:y] += previous[:y] > knot[:y] ? 1 : -1
+                end
             end
-            visited.add(tail.clone)
-            # puts "head #{head} tail #{tail}"
-            # puts visited
+            visited.add(rope.last.clone)
         end
     end
     visited.length
@@ -66,3 +70,7 @@ end
 
 test_equals(tail_positions('input9-example.txt'), 13)
 puts "part 1 #{tail_positions('input9.txt')}"
+
+test_equals(tail_positions('input9-example.txt', 10), 1)
+test_equals(tail_positions('input9-example-2.txt', 10), 36)
+puts "part 2 #{tail_positions('input9.txt', 10)}"
