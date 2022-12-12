@@ -15,16 +15,20 @@ $item_counter = 0
 class Item
     attr_accessor :id
     attr_accessor :worry_level
+    attr_accessor :max_worry_level
+    attr_accessor :divide_worry
 
-    def initialize(worry_level)
+    def initialize(worry_level, divide_worry)
         @id = $item_counter
         @worry_level = worry_level
         $item_counter += 1
+        @divide_worry = divide_worry
     end
 
     def adjust_worry(worry_operation)
         @worry_level = worry_operation.(@worry_level)
-        @worry_level = @worry_level / 3
+        @worry_level = @worry_level / 3 if @divide_worry
+        @worry_level = @worry_level % @max_worry_level
     end
 
     def test_worry(decision_test)
@@ -39,14 +43,16 @@ class Monkey
     attr_accessor :worry_operation
     attr_accessor :decision_test
     attr_accessor :throw_directions
+    attr_accessor :divisible_by
 
-    def initialize(id, items, worry_operation, decision_test, throw_directions)
+    def initialize(id, items, worry_operation, decision_test, throw_directions, divisible_by)
         @id = id
         @items = items
         @inspection_count = 0
         @worry_operation = worry_operation
         @decision_test = decision_test
         @throw_directions = throw_directions
+        @divisible_by = divisible_by
     end
 
     def inspect_item
@@ -54,7 +60,7 @@ class Monkey
     end
 end
 
-def parse(lines)
+def parse(lines, divide_worry)
     monkeys = []
     slices = lines.each_slice(7)
     slices.each_with_index do |slice, current_monkey|
@@ -68,7 +74,7 @@ def parse(lines)
             when 1
                 parts = line.split ' '
                 parts = parts.drop(2)
-                items = parts.map {|value| Item.new(value.to_i)}
+                items = parts.map {|value| Item.new(value.to_i, divide_worry)}
             when 2
                 parts = line.split ' '
                 amount = parts.pop
@@ -99,18 +105,26 @@ def parse(lines)
                 throw_direction[false] = throw_to
             end         
         end    
-        monkey = Monkey.new(current_monkey, items, worry_operation, decision_test, throw_direction)
+        monkey = Monkey.new(current_monkey, items, worry_operation, decision_test, throw_direction, divisible_by)
         monkeys.push monkey
     end
     monkeys
 end
 
-def level_moneky_business(file_name)
+def level_moneky_business(file_name, rounds = 20, divide_worry = true)
     lines = read_file(file_name)
-    monkeys = parse(lines)
+    monkeys = parse(lines, divide_worry)
+
+    # find the max worry level
+    max_worry = monkeys.map {|m| m.divisible_by}.reduce(:*)
+    monkeys.each do |m|
+        m.items.each do |i|
+            i.max_worry_level = max_worry
+        end
+    end
 
     # 20 rounds
-    (1..20).each do |round|
+    (1..rounds).each do |round|
         monkeys.each_with_index do |monkey|
             monkey.items.each do |item|
                 item.adjust_worry(monkey.worry_operation)
@@ -127,9 +141,18 @@ def level_moneky_business(file_name)
                 puts "Monkey #{monkey.id}: items #{monkey.items.map {|i| i.worry_level}}"
             end
         end
+        if false && (round % 1000 == 0 || round == 1 || round == 20)
+            puts "round #{round}"
+            monkeys.each do |monkey|
+                puts "Monkey #{monkey.id} inspected #{monkey.inspection_count} items"
+            end
+        end
     end
     inspection_counts = monkeys.map {|monkey| monkey.inspection_count}
     inspection_counts.sort.last(2).reduce(:*)
 end
 test_equals(level_moneky_business('input11-example.txt'), 10605)
 puts "part 1 #{level_moneky_business('input11.txt')}"
+
+test_equals(level_moneky_business('input11-example.txt', 10000, false), 2713310158)
+puts "part 2 #{level_moneky_business('input11.txt', 10000, false)}"
