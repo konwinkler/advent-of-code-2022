@@ -57,7 +57,7 @@ class Node
     end
 end
 
-def shortest_path(file_name)
+def shortest_path(file_name, start_at_any_a = false)
     start = nil
     finish = nil
     lines = read_file(file_name)
@@ -82,7 +82,12 @@ def shortest_path(file_name)
         end
     end
 
-    to_visit = [start]
+    if start_at_any_a
+        to_visit = nodes.filter {|node| node.height == 'a'}
+        to_visit.each {|node| node.steps = 0}
+    else
+        to_visit = [start]
+    end
     visited = Set.new
     found_finish = false
     while !found_finish
@@ -93,7 +98,7 @@ def shortest_path(file_name)
         steps = current.steps + 1
         neighbors = current.find_neighbors(nodes, height, width)
         neighbors.each do |neighbor|
-            if visited.include?(neighbor) || to_visit.include?(neighbor)
+            if visited.include?(neighbor) || to_visit.include?(neighbor)                
                 next
             end
             neighbor.steps = steps
@@ -106,3 +111,6 @@ end
 
 test_equals(shortest_path('input12-example.txt'), 31)
 puts "part 1 #{shortest_path('input12.txt')}"
+
+test_equals(shortest_path('input12-example.txt', true), 29)
+puts "part 2 #{shortest_path('input12.txt', true)}"
