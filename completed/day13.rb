@@ -66,7 +66,7 @@ test_equals(sum_indices('input13-example.txt'), 13)
 puts "part 1 #{sum_indices('input13.txt')}"
 
 def decoder_key(file_name, packet_one, packet_two)
-    lines = File.read(file_name).split("\n").filter {|x| x != ''}
+    lines = read_file(file_name).filter {|x| x != ''}
     packets = lines.map {|line| JSON.parse(line)}
     packets.push(packet_one)
     packets.push(packet_two)
