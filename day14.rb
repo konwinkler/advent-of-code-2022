@@ -12,7 +12,7 @@ def test_equals(actual, expected)
     raise "test failed, actual: #{actual} expected: #{expected}" unless actual == expected
 end
 
-def resting_sand(file_name)
+def resting_sand(file_name, floor = false)
     raw_lines = read_file(file_name)
     raw_paths = raw_lines.map {|line| line.split(' -> ')}
     lines = raw_paths.map {|p| p.map {|x|
@@ -25,7 +25,7 @@ def resting_sand(file_name)
     highest_y = lines.reduce(0) {|high, l|
         l_y = l.reduce(0) {|agg, point| [agg, point[1]].max}
         [high, l_y].max
-    }
+    } + 2
 
     # create a hash of blocked tiles
     blocked_tiles = Set.new
@@ -56,26 +56,38 @@ def resting_sand(file_name)
         directions.each {|dir|
             new_pos = sand + dir
             if !blocked_tiles.include?(new_pos) && !sand_tiles.include?(new_pos)
-                sand = new_pos
-                sand_moved = true
-                break
+                if floor && new_pos[1] == highest_y
+                    # blocked by floor
+                else
+                    sand = new_pos
+                    sand_moved = true
+                    break
+                end
             end
         }
         if !sand_moved
             sand_tiles.add(sand)
+            if sand == Vector[500.0, 0.0]
+                # draw(blocked_tiles, sand_tiles, highest_y)
+                return sand_tiles.size
+            end
             sand = Vector[500.0, 0.0]
         end
         # if higher than boundary stop
         if sand[1] > highest_y
-            draw(blocked_tiles, sand_tiles, highest_y)
+            # draw(blocked_tiles, sand_tiles, highest_y)
             return sand_tiles.size
         end
     end
 end
 
 def draw(blocked_tiles, sand_tiles, highest_y)
-    left = (blocked_tiles.reduce(500.0) {|agg, tile| [agg, tile[0]].min} - 1).to_i
-    right = (blocked_tiles.reduce(500.0) {|agg, tile| [agg, tile[0]].max} + 1).to_i
+    left_blocks = (blocked_tiles.reduce(500.0) {|agg, tile| [agg, tile[0]].min} - 1).to_i
+    right_blocks = (blocked_tiles.reduce(500.0) {|agg, tile| [agg, tile[0]].max} + 1).to_i
+    left_tiles = (sand_tiles.reduce(500.0) {|agg, tile| [agg, tile[0]].min} - 1).to_i
+    right_tiles = (sand_tiles.reduce(500.0) {|agg, tile| [agg, tile[0]].max} + 1).to_i
+    left = [left_blocks, left_tiles].min
+    right = [right_blocks, right_tiles].max
     rows = []
     (0..highest_y).each {|y|
         row = ''
@@ -98,3 +110,6 @@ end
 
 test_equals(resting_sand('input14-example.txt'), 24)
 puts "part 1 #{resting_sand('input14.txt')}"
+
+test_equals(resting_sand('input14-example.txt', true), 93)
+puts "part 2 #{resting_sand('input14.txt', true)}"
