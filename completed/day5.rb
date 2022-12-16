@@ -52,19 +52,19 @@ def top_crates(inputFile, single = true)
         amount = separated[1].to_i
         # change to zero index 
         from = separated[3].to_i - 1
-        to = separated[5].to_i - 1
+        target = separated[5].to_i - 1
         if single
             (1..amount).each do
                 item = stacks[from].pop
-                stacks[to].push item
+                stacks[target].push item
             end
         else
             items = []
             (1..amount).each do
                 items.push stacks[from].pop
             end
-            stacks[to].push items.reverse
-            stacks[to] = stacks[to].flatten
+            stacks[target].push items.reverse
+            stacks[target] = stacks[target].flatten
         end
     end
     # puts stacks

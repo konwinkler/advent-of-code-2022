@@ -21,11 +21,25 @@ def pressure_from_valves(taken_path, minutes = 1)
 end
 
 # BFS seach
-def distance(from, to)
-    current = from
-    visited = []
-    neighbors = current.tunnels_to
-    1
+def distance(from, target)
+    distance_travelled = 0
+    visited = Set.new
+    to_visit = [from]
+    while !to_visit.empty?
+        if to_visit.include? target
+            return distance_travelled
+        end
+        tunnels_to = to_visit.map {|x| x.tunnels_to}
+        visited.add to_visit
+        to_visit = []
+        distance_travelled += 1
+        tunnels_to.each {|x|
+            if !visited.include?(x)
+                to_visit.push x
+            end
+        }
+    end
+    raise "could not find distance form #{from} to #{to}"
 end
 
 def find_path(valves, taken_path, path_elements, minutes_left, pressure_released)
