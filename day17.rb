@@ -18,6 +18,12 @@ Chamber = Struct.new(:tiles) do
     def height
         tiles.reduce(0) {|highest, tile| [highest, tile[1]].max}
     end
+    def add_tiles(new_tiles)
+        tiles += new_tiles
+        while tiles.lenght > 100
+            tiles.unshift
+        end
+    end
 end
 test_equals(Chamber.new([]).height, 0)
 test_equals(Chamber.new([Vector[1, 1]]).height, 1)
@@ -144,7 +150,7 @@ def height_after(file_name, target_stopped_rocks)
             moved = rock.fall(chamber)
             # binding.pry
             if !moved
-                chamber.tiles += rock.tiles
+                chamber.add_tiles(rock.tiles)
                 stopped_rocks += 1
 
                 if stopped_rocks >= target_stopped_rocks
