@@ -12,10 +12,40 @@ def test_equals(actual, expected)
     raise "test failed, actual: #{actual} expected: #{expected}" unless actual == expected
 end
 
-Rock = Struct.new(:id)
-Rock_Tile = Struct.new(:id)
-Chamber = Struct.new(:id)
-Chamber_Tile = Struct.new(:id)
+# y == 0 is at the bottom
+
+Chamber = Struct.new(:tiles) do
+    def height
+        tiles.reduce(0) {|h, c| [h, c.y]}
+    end
+end
+$gust_map = {
+    '<' => Vector[-1, 0],    
+    '>' => Vector[1, 0]
+}
+class Rock
+    attr_accessor :tiles
+    def initialize(tiles)
+        @tiles = tiles
+    end
+    def push(gust, chamber)
+        push_direction = $gust_map[gust]
+        new_tiles = @tiles.map {|x| x + push_direction}
+        # out of bounds?
+        return itself if new_tiles.select {|x| x[0] < 0 || x[0] > 6}.any?
+        # running into an existing tile?
+        return itself if new_tiles.select {|x| chamber.tiles.include?(x)}.any?
+        # updates tiles
+        @tiles = new_tiles
+        itself
+    end
+end
+test_rock = Rock.new([Vector[0, 1]])
+test_chamber = Chamber.new([])
+test_equals(test_rock.push('>', test_chamber).tiles, [Vector[1, 1]])
+test_equals(test_rock.push('<', test_chamber).tiles, [Vector[0, 1]])
+test_equals(test_rock.push('<', test_chamber).tiles, [Vector[0, 1]])
+
 class Jet
     @counter
     def initialize(jet_pattern)
@@ -43,9 +73,18 @@ class Ceiling
             r.map {|x| Vector[x[0], x[1]]}
         }
     end
-    def next
+    def next(start_x = 0, start_y = 0)
+        @counter = 0 if @counter >= @rocks.length
+        rock = @rocks[@counter]
+        @counter += 1
+        start_position = Vector[start_x, start_y]
+        Rock.new(rock.map {|x| x + start_position})
     end
 end
+test_ceiling = Ceiling.new([[[1, 1]], [[2, 2], [3, 3]]])
+test_equals(test_ceiling.next.tiles, [Vector[1, 1]])
+test_equals(test_ceiling.next.tiles, [Vector[2, 2], Vector[3, 3]])
+test_equals(test_ceiling.next(5, 5).tiles, [Vector[6, 6]])
 
 def height_after(file_name, target_stopped_rocks)
     line = read_file(file_name)[0]
@@ -55,6 +94,11 @@ def height_after(file_name, target_stopped_rocks)
         [[0, 0], [1, 0], [2, 0], [3, 0]]
     ]
     ceiling = Ceiling.new(rock_templates)
+
+    chamber = Chamber.new([])
+    rock = ceiling.next(2, chamber.height + 3)
+    # rock affected by gust
+    rock.push(jet.next, chamber)
     binding.pry
 
 end
