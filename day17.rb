@@ -34,17 +34,30 @@ class Rock
         # out of bounds?
         return itself if new_tiles.select {|x| x[0] < 0 || x[0] > 6}.any?
         # running into an existing tile?
-        return itself if new_tiles.select {|x| chamber.tiles.include?(x)}.any?
+        return itself if new_tiles.select {|x| chamber.tiles.include? x }.any?
         # updates tiles
         @tiles = new_tiles
         itself
     end
+    def fall(chamber)
+        fall_direction = Vector[0, -1]
+        new_tiles = @tiles.map {|x| x + fall_direction}
+        blocked = false
+        # hit bottom?
+        blocked = true if new_tiles.select {|x| x[y] == 0}.any?
+        # hit other tile?
+        blocked = true if new_tiles.select {|x| chamber.tiles.include? x}.any?
+        blocked
 end
 test_rock = Rock.new([Vector[0, 1]])
 test_chamber = Chamber.new([])
 test_equals(test_rock.push('>', test_chamber).tiles, [Vector[1, 1]])
 test_equals(test_rock.push('<', test_chamber).tiles, [Vector[0, 1]])
 test_equals(test_rock.push('<', test_chamber).tiles, [Vector[0, 1]])
+
+test_equals(test_rock.fall(test_chamber), true)
+test_equals(test_rock.fall(test_chamber), false)
+test_equals(test_rock.tiles, [Vector[0, 0]]])
 
 class Jet
     @counter
@@ -99,6 +112,7 @@ def height_after(file_name, target_stopped_rocks)
     rock = ceiling.next(2, chamber.height + 3)
     # rock affected by gust
     rock.push(jet.next, chamber)
+    moved = rock.fall(chamber)
     binding.pry
 
 end
