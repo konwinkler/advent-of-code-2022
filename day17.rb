@@ -34,11 +34,29 @@ test_equals(test_jet.next, '<')
 test_equals(test_jet.next, '>')
 test_equals(test_jet.next, '<')
 
+class Ceiling
+    @counter
+    @rocks
+    def initialize(rock_templates)
+        @counter = 0
+        @rocks = rock_templates.map {|r|
+            r.map {|x| Vector[x[0], x[1]]}
+        }
+    end
+    def next
+    end
+end
+
 def height_after(file_name, target_stopped_rocks)
     line = read_file(file_name)[0]
     jet = Jet.new(line.split '')
 
-    
+    rock_templates = [
+        [[0, 0], [1, 0], [2, 0], [3, 0]]
+    ]
+    ceiling = Ceiling.new(rock_templates)
+    binding.pry
+
 end
 
 test_equals(height_after('input17-example.txt', 2022), 3068)
