@@ -19,10 +19,9 @@ Chamber = Struct.new(:tiles) do
         tiles.reduce(0) {|highest, tile| [highest, tile[1]].max}
     end
     def add_tiles(new_tiles)
-        tiles += new_tiles
-        while tiles.lenght > 100
-            tiles.unshift
-        end
+        # binding.pry
+        self.tiles += new_tiles
+        tiles.shift(tiles.length - 1000) if tiles.length > 1000
     end
 end
 test_equals(Chamber.new([]).height, 0)
@@ -41,9 +40,9 @@ class Rock
         push_direction = $gust_map[gust]
         new_tiles = @tiles.map {|x| x + push_direction}
         # out of bounds?
-        return itself if new_tiles.select {|x| x[0] < 0 || x[0] > 6}.any?
+        return itself if new_tiles.find {|x| x[0] < 0 || x[0] > 6} != nil
         # running into an existing tile?
-        return itself if new_tiles.select {|x| chamber.tiles.include? x }.any?
+        return itself if new_tiles.find {|x| chamber.tiles.include? x } != nil
         # updates tiles
         @tiles = new_tiles
         itself
@@ -52,10 +51,8 @@ class Rock
         fall_direction = Vector[0, -1]
         new_tiles = @tiles.map {|x| x + fall_direction}
         did_fall = true
-        # hit bottom?
-        did_fall = false if new_tiles.select {|x| x[1] == 0}.any?
-        # hit other tile?
-        did_fall = false if new_tiles.select {|x| chamber.tiles.include? x}.any?
+        # hit something
+        did_fall = false if new_tiles.find {|x| chamber.tiles.include? x} != nil || new_tiles.find {|x| x[1] == 0} != nil
         if did_fall
             @tiles = new_tiles
         end
@@ -115,7 +112,7 @@ test_equals(test_ceiling.next(5, 5).tiles, [Vector[6, 6]])
 def draw(chamber)
     h = chamber.height
     lines = []
-    h.downto(1).each do |y|
+    h.downto(h - 1000).each do |y|
         line = ''
         (0..6).each do |x|
             line += (chamber.tiles.include? Vector[x, y]) ? '#' : ' '
@@ -143,6 +140,9 @@ def height_after(file_name, target_stopped_rocks)
     stopped_rocks = 0
 
     loop do
+        if stopped_rocks % 1000 == 0
+            puts "completed #{stopped_rocks.to_f / target_stopped_rocks * 100.0} percent"
+        end
         rock = ceiling.next(2, chamber.height + 4)
         moved = true
         while moved do
@@ -154,7 +154,7 @@ def height_after(file_name, target_stopped_rocks)
                 stopped_rocks += 1
 
                 if stopped_rocks >= target_stopped_rocks
-                    # draw(chamber)
+                    draw(chamber)
                     # binding.pry
                     return chamber.height
                 end
@@ -162,15 +162,18 @@ def height_after(file_name, target_stopped_rocks)
         end
     end
 end
-test_equals(height_after('input17-example.txt', 1), 1)
-test_equals(height_after('input17-example.txt', 2), 4)
-test_equals(height_after('input17-example.txt', 3), 6)
-test_equals(height_after('input17-example.txt', 4), 7)
-test_equals(height_after('input17-example.txt', 5), 9)
-test_equals(height_after('input17-example.txt', 6), 10)
-test_equals(height_after('input17-example.txt', 7), 13)
-test_equals(height_after('input17-example.txt', 8), 15)
-test_equals(height_after('input17-example.txt', 9), 17)
-test_equals(height_after('input17-example.txt', 10), 17)
+# test_equals(height_after('input17-example.txt', 1), 1)
+# test_equals(height_after('input17-example.txt', 2), 4)
+# test_equals(height_after('input17-example.txt', 3), 6)
+# test_equals(height_after('input17-example.txt', 4), 7)
+# test_equals(height_after('input17-example.txt', 5), 9)
+# test_equals(height_after('input17-example.txt', 6), 10)
+# test_equals(height_after('input17-example.txt', 7), 13)
+# test_equals(height_after('input17-example.txt', 8), 15)
+# test_equals(height_after('input17-example.txt', 9), 17)
+# test_equals(height_after('input17-example.txt', 10), 17)
 # test_equals(height_after('input17-example.txt', 2022), 3068)
-puts "part 1 #{height_after('input17.txt', 2022)}"
+# puts "part 1 #{height_after('input17.txt', 2022)}"
+
+# test_equals(height_after('input17-example.txt', 1000000000000), 1514285714288)
+puts "part 2 #{height_after('input17.txt', 300)}"
